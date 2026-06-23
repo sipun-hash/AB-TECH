@@ -349,8 +349,8 @@ export default function GalleryPage({ onClose }) {
             </h1>
           </div>
           
-          {/* Category Filter Bar */}
-          <div className="flex flex-wrap gap-2">
+          {/* Category Filter Bar - Desktop */}
+          <div className="hidden sm:flex flex-wrap gap-2">
             {categories.map((cat) => {
               const isActive = activeCategory === cat;
               return (
@@ -367,6 +367,26 @@ export default function GalleryPage({ onClose }) {
                 </button>
               );
             })}
+          </div>
+
+          {/* Category Filter Bar - Mobile Dropdown */}
+          <div className="block sm:hidden relative min-w-[160px] w-full xs:w-auto">
+            <select
+              value={activeCategory}
+              onChange={(e) => setActiveCategory(e.target.value)}
+              className="w-full bg-white/60 border border-brandTeal/20 text-brandTeal hover:border-brandTeal/50 font-mono text-xs font-bold uppercase tracking-wider px-4 py-2.5 rounded-none outline-none appearance-none cursor-pointer pr-10 shadow-sm transition-all"
+            >
+              {categories.map((cat) => (
+                <option key={cat} value={cat} className="bg-[#f2f2f2] text-textPrimary">
+                  {cat}
+                </option>
+              ))}
+            </select>
+            <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-brandTeal">
+              <svg className="h-4 w-4 fill-current" viewBox="0 0 20 20">
+                <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
+              </svg>
+            </div>
           </div>
         </div>
 
