@@ -22,105 +22,6 @@ const getIconForCategory = (category) => {
   return categoryIcons[category] || categoryIcons.Default;
 };
 
-const bentoItems = [
-  {
-    title: 'Team Briefing',
-    desc: 'Alignment meetings discussing client deliverables and milestones.',
-    category: 'Workplace',
-    icon: Users,
-    url: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=800&q=80',
-    gridClass: 'col-span-2 row-span-1 h-[200px] md:col-span-2 md:row-span-1 md:h-[260px]'
-  },
-  {
-    title: 'Training Session',
-    desc: 'Onboarding bootcamps for freshers focusing on Excel and core processes.',
-    category: 'Training',
-    icon: BookOpen,
-    url: 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=800&q=80',
-    gridClass: 'col-span-1 row-span-2 h-[416px] md:col-span-1 md:row-span-2 md:h-[544px]'
-  },
-  {
-    title: 'Award Day',
-    desc: 'Recognizing monthly top performers across data and leadership roles.',
-    category: 'Events',
-    icon: Award,
-    url: 'https://images.unsplash.com/photo-1496171367470-9ed9a91ea931?auto=format&fit=crop&w=800&q=80',
-    gridClass: 'col-span-1 row-span-1 h-[200px] md:col-span-1 md:row-span-1 md:h-[260px]'
-  },
-  {
-    title: 'Onboarding Desk',
-    desc: 'Setting up new workspaces and accounts for the incoming cohort.',
-    category: 'Workplace',
-    icon: Coffee,
-    url: 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=800&q=80',
-    gridClass: 'col-span-1 row-span-1 h-[200px] md:col-span-2 md:row-span-1 md:h-[260px]'
-  },
-  {
-    title: 'Project Review',
-    desc: 'Structured quality assessment audits of database models.',
-    category: 'Training',
-    icon: Presentation,
-    url: 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?auto=format&fit=crop&w=800&q=80',
-    gridClass: 'col-span-1 row-span-1 h-[200px] md:col-span-1 md:row-span-1 md:h-[260px]'
-  },
-  {
-    title: 'Team Outing',
-    desc: 'Building bonds beyond coordinates and corporate structures.',
-    category: 'Events',
-    icon: Heart,
-    url: 'https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&w=800&q=80',
-    gridClass: 'col-span-1 row-span-2 h-[416px] md:col-span-1 md:row-span-2 md:h-[544px]'
-  },
-  {
-    title: 'Collaborative Coding',
-    desc: 'Developers pair programming and reviewing system logs together.',
-    category: 'Workplace',
-    icon: Users,
-    url: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=800&q=80',
-    gridClass: 'col-span-1 row-span-1 h-[200px] md:col-span-2 md:row-span-1 md:h-[260px]'
-  },
-  {
-    title: 'Technical Seminar',
-    desc: 'Weekly knowledge transfer session sharing coding standards.',
-    category: 'Training',
-    icon: BookOpen,
-    url: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=800&q=80',
-    gridClass: 'col-span-1 row-span-1 h-[200px] md:col-span-1 md:row-span-1 md:h-[260px]'
-  },
-  {
-    title: 'Office Celebration',
-    desc: 'Celebrating project milestones with team refreshments.',
-    category: 'Events',
-    icon: Award,
-    url: 'https://images.unsplash.com/photo-1516062423079-7ca13cca775f?auto=format&fit=crop&w=800&q=80',
-    gridClass: 'col-span-1 row-span-1 h-[200px] md:col-span-1 md:row-span-1 md:h-[260px]'
-  },
-  {
-    title: 'Code Architecture',
-    desc: 'Designing scalable front-ends and optimizing server render loops.',
-    category: 'Training',
-    icon: Presentation,
-    url: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=800&q=80',
-    gridClass: 'col-span-2 row-span-1 h-[200px] md:col-span-2 md:row-span-1 md:h-[260px]'
-  },
-  {
-    title: 'Design Sprint',
-    desc: 'Wireframing user-friendly interfaces with clean design patterns.',
-    category: 'Workplace',
-    icon: Coffee,
-    url: 'https://images.unsplash.com/photo-1556761175-b413da4baf72?auto=format&fit=crop&w=800&q=80',
-    gridClass: 'col-span-1 row-span-1 h-[200px] md:col-span-1 md:row-span-1 md:h-[260px]'
-  },
-  {
-    title: 'Fun & Games',
-    desc: 'Recreational activities to refresh minds and build connection.',
-    category: 'Events',
-    icon: Heart,
-    url: 'https://images.unsplash.com/photo-1528605248644-14dd04022da1?auto=format&fit=crop&w=800&q=80',
-    gridClass: 'col-span-1 row-span-1 h-[200px] md:col-span-3 md:row-span-1 md:h-[260px]'
-  }
-];
-
 const categories = ['All', 'Workplace', 'Training', 'Events'];
 
 export default function GalleryPage({ onClose }) {
@@ -130,7 +31,7 @@ export default function GalleryPage({ onClose }) {
   const containerRef = useRef(null);
 
   // Stateful list of items merging static and custom uploads
-  const [items, setItems] = useState(bentoItems);
+  const [items, setItems] = useState([]);
   const [loadingSnapshots, setLoadingSnapshots] = useState(true);
 
   // Fetch custom snapshots from Firestore on mount
@@ -140,7 +41,7 @@ export default function GalleryPage({ onClose }) {
       try {
         const dbSnapshots = await fetchSnapshots();
         if (active) {
-          setItems([...dbSnapshots, ...bentoItems]);
+          setItems(dbSnapshots);
         }
       } catch (err) {
         console.error('Failed to fetch snapshots from Firestore:', err);
@@ -264,6 +165,31 @@ export default function GalleryPage({ onClose }) {
     } finally {
       setUploading(false);
     }
+  };
+
+  const handleMediaLoad = (itemUrl, width, height) => {
+    if (!width || !height) return;
+    const ratio = width / height;
+    let computedClass = 'col-span-1 row-span-1 h-[200px] md:col-span-1 md:row-span-1 md:h-[260px]';
+    if (ratio > 1.35) {
+      computedClass = 'col-span-2 row-span-1 h-[200px] md:col-span-2 md:row-span-1 md:h-[260px]';
+    } else if (ratio < 0.75) {
+      computedClass = 'col-span-1 row-span-2 h-[416px] md:col-span-1 md:row-span-2 md:h-[544px]';
+    }
+
+    setItems(prevItems => 
+      prevItems.map(item => {
+        if (item.url === itemUrl) {
+          const hasDefaultClass = !item.gridClass || 
+            item.gridClass === 'col-span-1 row-span-1 h-[200px] md:h-[260px]' || 
+            item.gridClass === 'col-span-1 row-span-1 h-[200px] md:col-span-1 md:row-span-1 md:h-[260px]';
+          if (hasDefaultClass && item.gridClass !== computedClass) {
+            return { ...item, gridClass: computedClass };
+          }
+        }
+        return item;
+      })
+    );
   };
 
   // Lock body scroll of the parent viewport while overlay is mounted
@@ -461,12 +387,14 @@ export default function GalleryPage({ onClose }) {
                           loop
                           playsInline
                           autoPlay
+                          onLoadedMetadata={(e) => handleMediaLoad(item.url, e.target.videoWidth, e.target.videoHeight)}
                         />
                       ) : (
                         <img 
                           src={item.url} 
                           alt={item.title}
                           className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-110"
+                          onLoad={(e) => handleMediaLoad(item.url, e.target.naturalWidth, e.target.naturalHeight)}
                         />
                       )}
                       {/* Hover Tint Overlay */}
