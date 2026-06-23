@@ -166,6 +166,43 @@ export default function GalleryPage({ onClose }) {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
 
+  const getFileDimensions = (file) => {
+    return new Promise((resolve) => {
+      if (!file) {
+        resolve({ width: 0, height: 0 });
+        return;
+      }
+      if (file.type.startsWith('image/')) {
+        const img = new Image();
+        const objectUrl = URL.createObjectURL(file);
+        img.src = objectUrl;
+        img.onload = () => {
+          URL.revokeObjectURL(objectUrl);
+          resolve({ width: img.width, height: img.height });
+        };
+        img.onerror = () => {
+          if (objectUrl) URL.revokeObjectURL(objectUrl);
+          resolve({ width: 0, height: 0 });
+        };
+      } else if (file.type.startsWith('video/')) {
+        const video = document.createElement('video');
+        const objectUrl = URL.createObjectURL(file);
+        video.src = objectUrl;
+        video.preload = 'metadata';
+        video.onloadedmetadata = () => {
+          URL.revokeObjectURL(objectUrl);
+          resolve({ width: video.videoWidth, height: video.videoHeight });
+        };
+        video.onerror = () => {
+          if (objectUrl) URL.revokeObjectURL(objectUrl);
+          resolve({ width: 0, height: 0 });
+        };
+      } else {
+        resolve({ width: 0, height: 0 });
+      }
+    });
+  };
+
   const handleFileChange = (e) => {
     const selected = e.target.files?.[0];
     if (selected) {
@@ -182,6 +219,21 @@ export default function GalleryPage({ onClose }) {
     setError('');
 
     try {
+      // Get aspect ratio dimensions
+      const dimensions = await getFileDimensions(file);
+      let gridClass = 'col-span-1 row-span-1 h-[200px] md:col-span-1 md:row-span-1 md:h-[260px]'; // default square
+
+      if (dimensions.width > 0 && dimensions.height > 0) {
+        const ratio = dimensions.width / dimensions.height;
+        if (ratio > 1.35) {
+          // Landscape / Wide
+          gridClass = 'col-span-2 row-span-1 h-[200px] md:col-span-2 md:row-span-1 md:h-[260px]';
+        } else if (ratio < 0.75) {
+          // Portrait / Tall
+          gridClass = 'col-span-1 row-span-2 h-[416px] md:col-span-1 md:row-span-2 md:h-[544px]';
+        }
+      }
+
       // Call Cloudinary client upload utility
       const uploadRes = await uploadToCloudinary(file);
 
@@ -191,7 +243,7 @@ export default function GalleryPage({ onClose }) {
         category,
         url: uploadRes.url,
         isVideo: uploadRes.resourceType === 'video' || file.type.startsWith('video/'),
-        gridClass: 'col-span-1 row-span-1 h-[200px] md:h-[260px]'
+        gridClass
       };
 
       // Save to Firestore
