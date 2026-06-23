@@ -4,7 +4,8 @@ import Lightbox from 'yet-another-react-lightbox';
 import 'yet-another-react-lightbox/styles.css';
 import { 
   ArrowLeft, Maximize2, Users, Award, Coffee, 
-  BookOpen, Presentation, Heart, Upload, X, Film, Image as ImageIcon 
+  BookOpen, Presentation, Heart, Upload, X, Film, Image as ImageIcon,
+  ChevronDown
 } from 'lucide-react';
 import Lenis from 'lenis';
 import ScrollAnimateCard from './ScrollAnimateCard';
@@ -55,6 +56,7 @@ export default function GalleryPage({ onClose }) {
   const [activeCategory, setActiveCategory] = useState('All');
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
   const containerRef = useRef(null);
 
   // Stateful list of items merging static and custom uploads
@@ -370,23 +372,61 @@ export default function GalleryPage({ onClose }) {
           </div>
 
           {/* Category Filter Bar - Mobile Dropdown */}
-          <div className="block sm:hidden relative min-w-[160px] w-full xs:w-auto">
-            <select
-              value={activeCategory}
-              onChange={(e) => setActiveCategory(e.target.value)}
-              className="w-full bg-white/60 border border-brandTeal/20 text-brandTeal hover:border-brandTeal/50 font-mono text-xs font-bold uppercase tracking-wider px-4 py-2.5 rounded-none outline-none appearance-none cursor-pointer pr-10 shadow-sm transition-all"
+          <div className="block sm:hidden relative min-w-[160px] w-full xs:w-auto z-30">
+            <button
+              onClick={() => setDropdownOpen(!dropdownOpen)}
+              className="w-full flex items-center justify-between bg-white/70 border border-brandTeal/20 hover:border-brandTeal/50 text-brandTeal font-mono text-xs font-bold uppercase tracking-wider px-4 py-2.5 rounded-none outline-none cursor-pointer shadow-sm transition-all"
             >
-              {categories.map((cat) => (
-                <option key={cat} value={cat} className="bg-[#f2f2f2] text-textPrimary">
-                  {cat}
-                </option>
-              ))}
-            </select>
-            <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-brandTeal">
-              <svg className="h-4 w-4 fill-current" viewBox="0 0 20 20">
-                <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
-              </svg>
-            </div>
+              <span>{activeCategory}</span>
+              <motion.div
+                animate={{ rotate: dropdownOpen ? 180 : 0 }}
+                transition={{ duration: 0.25, ease: "easeInOut" }}
+                className="text-brandTeal ml-2"
+              >
+                <ChevronDown size={14} />
+              </motion.div>
+            </button>
+
+            <AnimatePresence>
+              {dropdownOpen && (
+                <>
+                  {/* Invisible backdrop to close on click outside */}
+                  <div 
+                    className="fixed inset-0 z-30 bg-black/5" 
+                    onClick={() => setDropdownOpen(false)} 
+                  />
+                  
+                  {/* Dropdown Options */}
+                  <motion.div
+                    initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                    transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+                    className="absolute right-0 left-0 mt-1.5 bg-white border border-brandTeal/15 shadow-xl z-40 rounded-none overflow-hidden"
+                  >
+                    {categories.map((cat) => {
+                      const isActive = activeCategory === cat;
+                      return (
+                        <button
+                          key={cat}
+                          onClick={() => {
+                            setActiveCategory(cat);
+                            setDropdownOpen(false);
+                          }}
+                          className={`w-full text-left px-4 py-3 font-mono text-xs font-bold uppercase tracking-wider transition-all duration-200 border-b border-textPrimary/5 last:border-b-0 ${
+                            isActive 
+                              ? 'bg-brandTeal/10 text-brandTeal border-l-2 border-l-brandTeal' 
+                              : 'text-textMuted hover:bg-[#E4EFF1]/50 hover:text-brandTeal'
+                          }`}
+                        >
+                          {cat}
+                        </button>
+                      );
+                    })}
+                  </motion.div>
+                </>
+              )}
+            </AnimatePresence>
           </div>
         </div>
 
