@@ -277,32 +277,32 @@ export default function GalleryPage({ onClose }) {
     >
       
       {/* Sticky Header Nav Bar */}
-      <header className="sticky top-0 z-[1010] bg-[#f2f2f2]/80 backdrop-blur-md border-b border-brandTeal/10 px-6 py-4 flex items-center justify-between">
-        <div className="flex items-center gap-3">
+      <header className="sticky top-0 z-[1010] bg-[#f2f2f2]/80 backdrop-blur-md border-b border-brandTeal/10 px-4 py-3 sm:px-6 sm:py-4 flex items-center justify-between">
+        <div className="flex items-center gap-2 sm:gap-3">
           <button 
             onClick={onClose}
-            className="flex items-center gap-2 px-4 py-2 border border-brandTeal/20 hover:border-brandTeal/60 text-brandTeal bg-white/40 font-mono text-xs font-bold uppercase tracking-wider transition-all duration-300 active:scale-95 rounded-none"
+            className="flex items-center gap-1.5 px-3 py-2 sm:px-4 sm:py-2 border border-brandTeal/20 hover:border-brandTeal/60 text-brandTeal bg-white/40 font-mono text-xs font-bold uppercase tracking-wider transition-all duration-300 active:scale-95 rounded-none"
           >
             <ArrowLeft size={14} />
-            Back to Drive
+            Back<span className="hidden sm:inline"> to Drive</span>
           </button>
           
           <button 
             onClick={() => setUploadModalOpen(true)}
-            className="flex items-center gap-2 px-4 py-2 border border-brandAmber/35 hover:border-brandAmber/85 text-brandAmber bg-white/40 font-mono text-xs font-bold uppercase tracking-wider transition-all duration-300 active:scale-95 rounded-none"
+            className="flex items-center gap-1.5 px-3 py-2 sm:px-4 sm:py-2 border border-brandAmber/35 hover:border-brandAmber/85 text-brandAmber bg-white/40 font-mono text-xs font-bold uppercase tracking-wider transition-all duration-300 active:scale-95 rounded-none"
           >
             <Upload size={14} />
-            Upload Snapshot
+            <span className="hidden sm:inline">Upload Snapshot</span>
           </button>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
           <img 
             src="/assets/WhatsApp Image 2026-06-21 at 6.52.02 PM (1).jpeg" 
             alt="AB IT Solutions Logo" 
             className="w-7 h-7 rounded object-cover"
           />
-          <span className="font-display font-bold text-xs tracking-wider text-textPrimary uppercase">
+          <span className="font-display font-bold text-xs tracking-wider text-textPrimary uppercase hidden sm:inline">
             AB IT Solutions
           </span>
         </div>
@@ -407,7 +407,7 @@ export default function GalleryPage({ onClose }) {
                     </div>
 
                     {/* Details Overlay */}
-                    <div className="relative z-20 bg-white/90 backdrop-blur-sm border-t border-textPrimary/5 p-4 flex flex-col justify-between min-h-[30%] min-h-[80px] w-full transition-colors duration-300 group-hover:bg-white shrink-0">
+                    <div className="relative z-20 bg-white/90 backdrop-blur-sm border-t border-textPrimary/5 p-2.5 pb-2 flex flex-col justify-between min-h-[68px] w-full transition-colors duration-300 group-hover:bg-white shrink-0">
                       <div className="flex justify-between items-center mb-1">
                         <div className="flex items-center gap-1.5">
                           <div className="p-1 rounded-none bg-brandTeal/10 border border-brandTeal/10 text-brandTeal">
