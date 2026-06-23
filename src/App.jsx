@@ -36,6 +36,33 @@ export default function App() {
     restDelta: 0.001
   });
 
+  // Sync galleryPageOpen state with URL hash navigation
+  useEffect(() => {
+    const handleHashChange = () => {
+      if (window.location.hash === '#snapshots') {
+        setGalleryPageOpen(true);
+      } else {
+        setGalleryPageOpen(false);
+      }
+    };
+
+    // Run once on load
+    handleHashChange();
+
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, []);
+
+  const handleCloseGallery = () => {
+    if (window.location.hash === '#snapshots') {
+      window.history.pushState('', document.title, window.location.pathname + window.location.search);
+      // Manually trigger hashchange event because pushState doesn't fire it automatically
+      window.dispatchEvent(new HashChangeEvent('hashchange'));
+    } else {
+      setGalleryPageOpen(false);
+    }
+  };
+
   // Handle body overflow locking to prevent premature scrolling
   useEffect(() => {
     if (loading) {
@@ -156,7 +183,7 @@ export default function App() {
             <WhyJoin />
             <SelectionProcess />
             <EligibilitySkills />
-            <Gallery onExplore={() => setGalleryPageOpen(true)} />
+            <Gallery onExplore={() => { window.location.hash = 'snapshots'; }} />
             <Testimonials />
             <OurTeam />
             <StatsCounter />
@@ -171,7 +198,7 @@ export default function App() {
           {/* Full-screen Gallery Page overlay */}
           <AnimatePresence>
             {galleryPageOpen && (
-              <GalleryPage onClose={() => setGalleryPageOpen(false)} />
+              <GalleryPage onClose={handleCloseGallery} />
             )}
           </AnimatePresence>
         </div>
