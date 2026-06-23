@@ -24,6 +24,33 @@ const getIconForCategory = (category) => {
 
 const categories = ['All', 'Workplace', 'Training', 'Events'];
 
+const animationPatterns = [
+  {
+    animate: { scale: [1.05, 1.10, 1.05], y: [0, -4, 0] },
+    transition: { duration: 8, ease: "easeInOut", repeat: Infinity }
+  },
+  {
+    animate: { x: [0, 6, 0], scale: [1.07, 1.12, 1.07] },
+    transition: { duration: 9, ease: "easeInOut", repeat: Infinity }
+  },
+  {
+    animate: { rotate: [0, 0.8, 0], scale: [1.08, 1.13, 1.08], y: [0, 4, 0] },
+    transition: { duration: 10, ease: "easeInOut", repeat: Infinity }
+  },
+  {
+    animate: { x: [0, -6, 0], y: [0, -3, 0], scale: [1.06, 1.11, 1.06] },
+    transition: { duration: 8.5, ease: "easeInOut", repeat: Infinity }
+  },
+  {
+    animate: { y: [0, 5, 0], scale: [1.10, 1.05, 1.10] },
+    transition: { duration: 9.5, ease: "easeInOut", repeat: Infinity }
+  },
+  {
+    animate: { x: [-3, 3, -3], y: [-3, 3, -3], scale: [1.07, 1.12, 1.07] },
+    transition: { duration: 11, ease: "easeInOut", repeat: Infinity }
+  }
+];
+
 export default function GalleryPage({ onClose }) {
   const [activeCategory, setActiveCategory] = useState('All');
   const [lightboxOpen, setLightboxOpen] = useState(false);
@@ -380,21 +407,27 @@ export default function GalleryPage({ onClose }) {
                     {/* Image/Video wrapper */}
                     <div className="absolute inset-0 overflow-hidden z-0">
                       {item.isVideo || item.url.match(/\.(mp4|webm|ogg|mov)$/i) || item.url.includes('/video/upload/') ? (
-                        <video 
+                        <motion.video 
                           src={item.url} 
-                          className="w-full h-full object-cover"
+                          className="w-full h-full object-cover origin-center"
                           muted
                           loop
                           playsInline
                           autoPlay
                           onLoadedMetadata={(e) => handleMediaLoad(item.url, e.target.videoWidth, e.target.videoHeight)}
+                          animate={animationPatterns[idx % animationPatterns.length].animate}
+                          transition={animationPatterns[idx % animationPatterns.length].transition}
+                          whileHover={{ scale: 1.18, transition: { duration: 0.5, ease: "easeOut" } }}
                         />
                       ) : (
-                        <img 
+                        <motion.img 
                           src={item.url} 
                           alt={item.title}
-                          className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-110"
+                          className="w-full h-full object-cover origin-center"
                           onLoad={(e) => handleMediaLoad(item.url, e.target.naturalWidth, e.target.naturalHeight)}
+                          animate={animationPatterns[idx % animationPatterns.length].animate}
+                          transition={animationPatterns[idx % animationPatterns.length].transition}
+                          whileHover={{ scale: 1.18, transition: { duration: 0.5, ease: "easeOut" } }}
                         />
                       )}
                       {/* Hover Tint Overlay */}
