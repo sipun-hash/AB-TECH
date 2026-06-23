@@ -398,17 +398,21 @@ export default function GalleryPage({ onClose }) {
                   
                   {/* Dropdown Options */}
                   <motion.div
-                    initial={{ opacity: 0, y: -10, scale: 0.95 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                    transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-                    className="absolute right-0 left-0 mt-1.5 bg-white border border-brandTeal/15 shadow-xl z-40 rounded-none overflow-hidden"
+                    initial={{ opacity: 0, scaleY: 0 }}
+                    animate={{ opacity: 1, scaleY: 1 }}
+                    exit={{ opacity: 0, scaleY: 0 }}
+                    style={{ originY: 0 }}
+                    transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                    className="absolute right-0 left-0 mt-1.5 bg-white border border-brandTeal/15 shadow-xl z-40 rounded-none overflow-hidden origin-top"
                   >
-                    {categories.map((cat) => {
+                    {categories.map((cat, idx) => {
                       const isActive = activeCategory === cat;
                       return (
-                        <button
+                        <motion.button
                           key={cat}
+                          initial={{ opacity: 0, x: -8 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: idx * 0.04, duration: 0.25, ease: "easeOut" }}
                           onClick={() => {
                             setActiveCategory(cat);
                             setDropdownOpen(false);
@@ -420,7 +424,7 @@ export default function GalleryPage({ onClose }) {
                           }`}
                         >
                           {cat}
-                        </button>
+                        </motion.button>
                       );
                     })}
                   </motion.div>
