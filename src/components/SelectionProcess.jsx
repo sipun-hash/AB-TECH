@@ -93,26 +93,37 @@ export default function SelectionProcess() {
 
         {/* Toggle Tabs */}
         <div className="flex justify-center mt-6 mb-16">
-          <div className="p-1 rounded-full bg-[#E4EFF1]/60 border border-white/60 flex gap-1">
+          <div className="p-1 rounded-full bg-[#E4EFF1]/70 backdrop-blur-sm border border-white/80 flex gap-1.5 relative shadow-sm z-10">
             <button
               onClick={() => setActiveTab('data')}
-              className={`px-6 py-2.5 rounded-full font-display text-sm font-semibold tracking-wider transition-all duration-300 ${
-                activeTab === 'data'
-                  ? 'bg-brandTeal text-white shadow-neon-teal'
-                  : 'text-textMuted hover:text-textPrimary'
+              className={`px-6 py-2.5 rounded-full font-display text-sm font-semibold tracking-wider relative transition-colors duration-300 active:scale-95 ${
+                activeTab === 'data' ? 'text-white' : 'text-textMuted hover:text-[#1E6B7B]'
               }`}
             >
-              Data Roles
+              {activeTab === 'data' && (
+                <motion.div
+                  layoutId="activeStepTabIndicator"
+                  className="absolute inset-0 bg-[#1E6B7B] shadow-neon-teal rounded-full -z-10"
+                  transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+                />
+              )}
+              <span className="relative z-10">Data Roles</span>
             </button>
+            
             <button
               onClick={() => setActiveTab('project')}
-              className={`px-6 py-2.5 rounded-full font-display text-sm font-semibold tracking-wider transition-all duration-300 ${
-                activeTab === 'project'
-                  ? 'bg-brandAmber text-white shadow-neon-amber'
-                  : 'text-textMuted hover:text-textPrimary'
+              className={`px-6 py-2.5 rounded-full font-display text-sm font-semibold tracking-wider relative transition-colors duration-300 active:scale-95 ${
+                activeTab === 'project' ? 'text-white' : 'text-textMuted hover:text-brandAmber'
               }`}
             >
-              Project Coordinator
+              {activeTab === 'project' && (
+                <motion.div
+                  layoutId="activeStepTabIndicator"
+                  className="absolute inset-0 bg-brandAmber shadow-neon-amber rounded-full -z-10"
+                  transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+                />
+              )}
+              <span className="relative z-10">Project Coordinator</span>
             </button>
           </div>
         </div>
