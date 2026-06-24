@@ -112,7 +112,7 @@ export default function Hero() {
               <span className="relative inline-flex rounded-full h-2 w-2 bg-brandTeal shadow-[0_0_8px_rgba(30,107,123,0.6)]"></span>
             </span>
             <span className="font-mono text-[9.5px] font-bold text-brandTeal tracking-[0.2em] uppercase">
-              RECRUITMENT DRIVE 2025
+              RECRUITMENT DRIVE 2026
             </span>
             <span className="h-3 w-[1px] bg-brandTeal/20 mx-0.5" />
             <span className="font-mono text-[9px] font-semibold text-brandAmber/85 uppercase tracking-[0.1em]">
