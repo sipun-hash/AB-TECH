@@ -98,6 +98,12 @@
   }
 }
 
+/* Restore default cursor inside Lightbox for precise media control */
+.yarl__portal,
+.yarl__portal * {
+  cursor: auto !important;
+}
+
 /* Bento card parallax container */
 .bento-card-container {
   perspective: 1000px;

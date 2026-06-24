@@ -27,6 +27,12 @@ export default function CustomCursor() {
     mediaQuery.addEventListener('change', handleMediaChange);
 
     const moveCursor = (e) => {
+      if (e.target && e.target.closest('.yarl__portal')) {
+        hiddenRef.current = true;
+        setHidden(true);
+        return;
+      }
+
       cursorX.set(e.clientX - (hoveredRef.current ? 28 : 6));
       cursorY.set(e.clientY - (hoveredRef.current ? 28 : 6));
       if (hiddenRef.current) {
