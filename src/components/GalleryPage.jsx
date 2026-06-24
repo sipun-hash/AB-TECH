@@ -138,6 +138,23 @@ export default function GalleryPage({ onClose }) {
   });
   const [copiedId, setCopiedId] = useState(null);
 
+  // Logo flip and hidden upload toggle states
+  const [logoClicks, setLogoClicks] = useState(0);
+  const [showUploadButton, setShowUploadButton] = useState(false);
+  const [isFlipped, setIsFlipped] = useState(false);
+
+  const handleLogoClick = () => {
+    setLogoClicks(prev => {
+      const next = prev + 1;
+      if (next >= 3) {
+        setShowUploadButton(true);
+        setIsFlipped(true);
+        return 0;
+      }
+      return next;
+    });
+  };
+
   useEffect(() => {
     localStorage.setItem('ab_tech_liked_snapshots', JSON.stringify(likedIds));
   }, [likedIds]);
@@ -500,34 +517,47 @@ export default function GalleryPage({ onClose }) {
             Back<span className="hidden sm:inline"> to Drive</span>
           </button>
           
-          <button 
-            onClick={() => setUploadModalOpen(true)}
-            className="flex items-center gap-1.5 px-3 py-2 sm:px-4 sm:py-2 border border-brandAmber/35 hover:border-brandAmber/85 text-brandAmber bg-white/40 font-mono text-xs font-bold uppercase tracking-wider transition-all duration-300 active:scale-95 rounded-none"
-          >
-            <Upload size={14} />
-            <span className="hidden sm:inline">Upload Snapshot</span>
-          </button>
+          <AnimatePresence>
+            {showUploadButton && (
+              <motion.button 
+                initial={{ opacity: 0, scale: 0.8, x: -10 }}
+                animate={{ opacity: 1, scale: 1, x: 0 }}
+                exit={{ opacity: 0, scale: 0.8, x: -10 }}
+                onClick={() => setUploadModalOpen(true)}
+                className="flex items-center gap-1.5 px-3 py-2 sm:px-4 sm:py-2 border border-brandAmber/35 hover:border-brandAmber/85 text-brandAmber bg-white/40 font-mono text-xs font-bold uppercase tracking-wider transition-all duration-300 active:scale-95 rounded-none"
+              >
+                <Upload size={14} />
+                <span className="hidden sm:inline">Upload Snapshot</span>
+              </motion.button>
+            )}
+          </AnimatePresence>
         </div>
 
-        <div className="flex items-center gap-2 sm:gap-3">
+        <motion.div 
+          onClick={handleLogoClick}
+          animate={{ rotateY: isFlipped ? 360 : 0 }}
+          onAnimationComplete={() => setIsFlipped(false)}
+          transition={{ duration: 0.6, ease: "easeInOut" }}
+          className="flex items-center gap-2 sm:gap-3 cursor-pointer select-none"
+        >
           <img 
             src="/assets/WhatsApp Image 2026-06-21 at 6.52.02 PM (1).jpeg" 
             alt="AB IT Solutions Logo" 
-            className="w-7 h-7 rounded object-cover"
+            className="w-7 h-7 rounded object-cover pointer-events-none"
           />
-          <span className="font-display font-bold text-xs tracking-wider text-textPrimary uppercase hidden sm:inline">
+          <span className="font-display font-bold text-xs tracking-wider text-textPrimary uppercase hidden sm:inline pointer-events-none">
             AB IT Solutions
           </span>
-        </div>
+        </motion.div>
       </header>
 
       {/* Main Section */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-6 py-12">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-6 pt-4 pb-8">
         
         {/* Title */}
-        <div className="mb-10 border-b border-textPrimary/10 pb-6 flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div className="mb-6 border-b border-textPrimary/10 pb-4 flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div>
-            <span className="font-mono text-xs font-bold text-brandTeal tracking-widest uppercase block mb-2">
+            <span className="font-mono text-xs font-bold text-brandTeal tracking-widest uppercase block mb-0.5">
               ✦ MEDIA ARCHIVE {loadingSnapshots && ' (LOADING SNAPSHOTS...)'}
             </span>
             <h1 className="font-display font-bold text-3xl md:text-5xl text-textPrimary tracking-tight uppercase text-3d">
