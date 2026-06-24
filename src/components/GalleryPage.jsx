@@ -52,6 +52,22 @@ const animationPatterns = [
   }
 ];
 
+const getOptimizedVideoUrl = (url, isThumbnail = true) => {
+  if (!url || !url.includes('/video/upload/')) return url;
+  const transformation = isThumbnail
+    ? 'q_auto,f_auto,c_scale,w_480'
+    : 'q_auto,f_auto';
+  return url.replace('/video/upload/', `/video/upload/${transformation}/`);
+};
+
+const getVideoPosterUrl = (url, isThumbnail = true) => {
+  if (!url || !url.includes('/video/upload/')) return undefined;
+  const transformation = isThumbnail
+    ? 'q_auto,f_auto,c_scale,w_480'
+    : 'q_auto,f_auto,w_1280';
+  return url.replace('/video/upload/', `/video/upload/${transformation}/`).replace(/\.[^/.]+$/, '.jpg');
+};
+
 const SkeletonCard = ({ gridClass }) => {
   return (
     <div className={`${gridClass} relative overflow-hidden border border-textPrimary/5 bg-white/40 flex flex-col justify-end w-full h-full rounded-none`}>
@@ -83,13 +99,18 @@ const VideoSlide = ({ src, isCurrent }) => {
     }
   }, [isCurrent]);
 
+  const optimizedSrc = getOptimizedVideoUrl(src, false);
+  const posterUrl = getVideoPosterUrl(src, false);
+
   return (
     <div className="w-full h-full flex items-center justify-center p-4">
       <video
         ref={videoRef}
-        src={src}
+        src={optimizedSrc}
+        poster={posterUrl}
         className="max-w-full max-h-full object-contain"
         controls
+        preload="auto"
         playsInline
       />
     </div>
@@ -543,12 +564,14 @@ export default function GalleryPage({ onClose }) {
                       <div className="absolute inset-0 overflow-hidden z-0">
                         {item.isVideo || item.url.match(/\.(mp4|webm|ogg|mov)$/i) || item.url.includes('/video/upload/') ? (
                           <motion.video 
-                            src={item.url} 
+                            src={getOptimizedVideoUrl(item.url)} 
+                            poster={getVideoPosterUrl(item.url)}
                             className="w-full h-full object-cover origin-center"
                             muted
                             loop
                             playsInline
                             autoPlay
+                            preload="metadata"
                             onLoadedMetadata={(e) => handleMediaLoad(item.url, e.target.videoWidth, e.target.videoHeight)}
                             animate={animationPatterns[idx % animationPatterns.length].animate}
                             transition={animationPatterns[idx % animationPatterns.length].transition}
