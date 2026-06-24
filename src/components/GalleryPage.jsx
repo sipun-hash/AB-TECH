@@ -52,6 +52,22 @@ const animationPatterns = [
   }
 ];
 
+const SkeletonCard = ({ gridClass }) => {
+  return (
+    <div className={`${gridClass} relative overflow-hidden border border-textPrimary/5 bg-white/40 flex flex-col justify-end w-full h-full rounded-none`}>
+      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-pulse" style={{ animationDuration: '1.8s' }} />
+      <div className="relative z-20 bg-white/60 border-t border-textPrimary/5 p-2.5 pb-2 flex flex-col gap-1.5 min-h-[68px] w-full shrink-0">
+        <div className="flex justify-between items-center w-full">
+          <div className="w-16 h-2.5 bg-brandTeal/15 animate-pulse rounded-none" />
+          <div className="w-6 h-2 bg-textMuted/15 animate-pulse rounded-none" />
+        </div>
+        <div className="w-2/3 h-3 bg-textPrimary/15 animate-pulse rounded-none mt-1" />
+        <div className="w-5/6 h-2 bg-textMuted/10 animate-pulse rounded-none mt-0.5" />
+      </div>
+    </div>
+  );
+};
+
 const VideoSlide = ({ src, isCurrent }) => {
   const videoRef = useRef(null);
 
@@ -481,93 +497,114 @@ export default function GalleryPage({ onClose }) {
           }`}
         >
           <AnimatePresence mode="popLayout">
-            {filteredItems.map((item, idx) => {
-              const Icon = item.icon || getIconForCategory(item.category);
-              return (
-                <ScrollAnimateCard
-                  key={item.title}
-                  index={idx}
-                  yOffset={40}
-                  scale={0.97}
-                  blur="6px"
-                  threshold="-20px"
-                  viewport={{ root: containerRef }}
-                  className={activeCategory === 'All' ? item.gridClass : 'col-span-1 h-[200px] md:h-[280px]'}
-                >
-                  <motion.div
-                    layout
-                    onClick={() => {
-                      setLightboxIndex(idx);
-                      setLightboxOpen(true);
-                    }}
-                    className="group relative overflow-hidden cursor-pointer border border-textPrimary/10 flex flex-col justify-end transition-all duration-500 rounded-none bg-white shadow-sm w-full h-full"
+            {loadingSnapshots ? (
+              activeCategory === 'All' ? (
+                <>
+                  <SkeletonCard gridClass="col-span-1 row-span-1 h-[200px] md:col-span-1 md:row-span-1 md:h-[260px]" />
+                  <SkeletonCard gridClass="col-span-2 row-span-1 h-[200px] md:col-span-2 md:row-span-1 md:h-[260px]" />
+                  <SkeletonCard gridClass="col-span-1 row-span-2 h-[416px] md:col-span-1 md:row-span-2 md:h-[544px]" />
+                  <SkeletonCard gridClass="col-span-1 row-span-1 h-[200px] md:col-span-1 md:row-span-1 md:h-[260px]" />
+                  <SkeletonCard gridClass="col-span-2 row-span-1 h-[200px] md:col-span-2 md:row-span-1 md:h-[260px]" />
+                  <SkeletonCard gridClass="col-span-1 row-span-1 h-[200px] md:col-span-1 md:row-span-1 md:h-[260px]" />
+                </>
+              ) : (
+                <>
+                  <SkeletonCard gridClass="col-span-1 h-[200px] md:h-[280px]" />
+                  <SkeletonCard gridClass="col-span-1 h-[200px] md:h-[280px]" />
+                  <SkeletonCard gridClass="col-span-1 h-[200px] md:h-[280px]" />
+                  <SkeletonCard gridClass="col-span-1 h-[200px] md:h-[280px]" />
+                  <SkeletonCard gridClass="col-span-1 h-[200px] md:h-[280px]" />
+                  <SkeletonCard gridClass="col-span-1 h-[200px] md:h-[280px]" />
+                </>
+              )
+            ) : (
+              filteredItems.map((item, idx) => {
+                const Icon = item.icon || getIconForCategory(item.category);
+                return (
+                  <ScrollAnimateCard
+                    key={item.title}
+                    index={idx}
+                    yOffset={40}
+                    scale={0.97}
+                    blur="6px"
+                    threshold="-20px"
+                    viewport={{ root: containerRef }}
+                    className={activeCategory === 'All' ? item.gridClass : 'col-span-1 h-[200px] md:h-[280px]'}
                   >
-                    {/* Image/Video wrapper */}
-                    <div className="absolute inset-0 overflow-hidden z-0">
-                      {item.isVideo || item.url.match(/\.(mp4|webm|ogg|mov)$/i) || item.url.includes('/video/upload/') ? (
-                        <motion.video 
-                          src={item.url} 
-                          className="w-full h-full object-cover origin-center"
-                          muted
-                          loop
-                          playsInline
-                          autoPlay
-                          onLoadedMetadata={(e) => handleMediaLoad(item.url, e.target.videoWidth, e.target.videoHeight)}
-                          animate={animationPatterns[idx % animationPatterns.length].animate}
-                          transition={animationPatterns[idx % animationPatterns.length].transition}
-                          whileHover={{ scale: 1.18, transition: { duration: 0.5, ease: "easeOut" } }}
-                        />
-                      ) : (
-                        <motion.img 
-                          src={item.url} 
-                          alt={item.title}
-                          className="w-full h-full object-cover origin-center"
-                          onLoad={(e) => handleMediaLoad(item.url, e.target.naturalWidth, e.target.naturalHeight)}
-                          animate={animationPatterns[idx % animationPatterns.length].animate}
-                          transition={animationPatterns[idx % animationPatterns.length].transition}
-                          whileHover={{ scale: 1.18, transition: { duration: 0.5, ease: "easeOut" } }}
-                        />
-                      )}
-                      {/* Hover Tint Overlay */}
-                      <div className="absolute inset-0 bg-[#112f35]/25 opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10" />
-                    </div>
+                    <motion.div
+                      layout
+                      onClick={() => {
+                        setLightboxIndex(idx);
+                        setLightboxOpen(true);
+                      }}
+                      className="group relative overflow-hidden cursor-pointer border border-textPrimary/10 flex flex-col justify-end transition-all duration-500 rounded-none bg-white shadow-sm w-full h-full"
+                    >
+                      {/* Image/Video wrapper */}
+                      <div className="absolute inset-0 overflow-hidden z-0">
+                        {item.isVideo || item.url.match(/\.(mp4|webm|ogg|mov)$/i) || item.url.includes('/video/upload/') ? (
+                          <motion.video 
+                            src={item.url} 
+                            className="w-full h-full object-cover origin-center"
+                            muted
+                            loop
+                            playsInline
+                            autoPlay
+                            onLoadedMetadata={(e) => handleMediaLoad(item.url, e.target.videoWidth, e.target.videoHeight)}
+                            animate={animationPatterns[idx % animationPatterns.length].animate}
+                            transition={animationPatterns[idx % animationPatterns.length].transition}
+                            whileHover={{ scale: 1.18, transition: { duration: 0.5, ease: "easeOut" } }}
+                          />
+                        ) : (
+                          <motion.img 
+                            src={item.url} 
+                            alt={item.title}
+                            className="w-full h-full object-cover origin-center"
+                            onLoad={(e) => handleMediaLoad(item.url, e.target.naturalWidth, e.target.naturalHeight)}
+                            animate={animationPatterns[idx % animationPatterns.length].animate}
+                            transition={animationPatterns[idx % animationPatterns.length].transition}
+                            whileHover={{ scale: 1.18, transition: { duration: 0.5, ease: "easeOut" } }}
+                          />
+                        )}
+                        {/* Hover Tint Overlay */}
+                        <div className="absolute inset-0 bg-[#112f35]/25 opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10" />
+                      </div>
 
-                    {/* Top-Right Maximize Overlay Icon */}
-                    <div className="absolute top-4 right-4 z-20 w-8 h-8 bg-white/80 backdrop-blur-sm border border-textPrimary/10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-[-10px] group-hover:translate-y-0 rounded-none">
-                      <Maximize2 size={12} className="text-brandTeal" />
-                    </div>
+                      {/* Top-Right Maximize Overlay Icon */}
+                      <div className="absolute top-4 right-4 z-20 w-8 h-8 bg-white/80 backdrop-blur-sm border border-textPrimary/10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-[-10px] group-hover:translate-y-0 rounded-none">
+                        <Maximize2 size={12} className="text-brandTeal" />
+                      </div>
 
-                    {/* Details Overlay */}
-                    <div className="relative z-20 bg-white/90 backdrop-blur-sm border-t border-textPrimary/5 p-2.5 pb-2 flex flex-col justify-between min-h-[68px] w-full transition-colors duration-300 group-hover:bg-white shrink-0">
-                      <div className="flex justify-between items-center mb-1">
-                        <div className="flex items-center gap-1.5">
-                          <div className="p-1 rounded-none bg-brandTeal/10 border border-brandTeal/10 text-brandTeal">
-                            <Icon size={10} />
+                      {/* Details Overlay */}
+                      <div className="relative z-20 bg-white/90 backdrop-blur-sm border-t border-textPrimary/5 p-2.5 pb-2 flex flex-col justify-between min-h-[68px] w-full transition-colors duration-300 group-hover:bg-white shrink-0">
+                        <div className="flex justify-between items-center mb-1">
+                          <div className="flex items-center gap-1.5">
+                            <div className="p-1 rounded-none bg-brandTeal/10 border border-brandTeal/10 text-brandTeal">
+                              <Icon size={10} />
+                            </div>
+                            <span className="font-mono text-[9px] font-bold text-brandTeal uppercase tracking-wider">
+                              {item.category}
+                            </span>
                           </div>
-                          <span className="font-mono text-[9px] font-bold text-brandTeal uppercase tracking-wider">
-                            {item.category}
+                          <span className="font-mono text-[10px] text-textMuted">
+                            {String(idx + 1).padStart(2, '0')}
                           </span>
                         </div>
-                        <span className="font-mono text-[10px] text-textMuted">
-                          {String(idx + 1).padStart(2, '0')}
-                        </span>
+                        <h3 className="font-display font-bold text-xs text-textPrimary uppercase tracking-wide truncate">
+                          {item.title}
+                        </h3>
+                        <p className="text-textMuted text-[10px] leading-relaxed font-sans line-clamp-1 mt-1">
+                          {item.desc}
+                        </p>
                       </div>
-                      <h3 className="font-display font-bold text-xs text-textPrimary uppercase tracking-wide truncate">
-                        {item.title}
-                      </h3>
-                      <p className="text-textMuted text-[10px] leading-relaxed font-sans line-clamp-1 mt-1">
-                        {item.desc}
-                      </p>
-                    </div>
-                  </motion.div>
-                </ScrollAnimateCard>
-              );
-            })}
+                    </motion.div>
+                  </ScrollAnimateCard>
+                );
+              })
+            )}
           </AnimatePresence>
         </motion.div>
-
         {/* Empty state if no items match */}
-        {filteredItems.length === 0 && (
+        {!loadingSnapshots && filteredItems.length === 0 && (
           <div className="py-20 text-center border border-dashed border-brandTeal/20">
             <p className="text-textMuted font-mono text-xs">No media files found in this category.</p>
           </div>
