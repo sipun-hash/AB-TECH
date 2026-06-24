@@ -168,7 +168,7 @@ export default function GalleryPage({ onClose }) {
 
   const handleShare = async (item, e) => {
     if (e) e.stopPropagation();
-    const shareUrl = `${window.location.origin}${window.location.pathname}?snapshot=${item.id}#snapshots`;
+    const shareUrl = `${window.location.origin}${window.location.pathname}#s-${item.id}`;
     const shareData = {
       title: item.title,
       text: item.desc || `Check out this snapshot: ${item.title}`,
@@ -232,11 +232,18 @@ export default function GalleryPage({ onClose }) {
     };
   }, []);
 
-  // Auto-open Lightbox from URL parameter
+  // Auto-open Lightbox from URL parameter or hash routing
   useEffect(() => {
-    if (items.length > 0 && !lightboxOpen) {
+    const handleDeepLink = () => {
+      if (items.length === 0) return;
       const params = new URLSearchParams(window.location.search);
-      const snapshotId = params.get('snapshot');
+      let snapshotId = params.get('snapshot');
+      
+      const hash = window.location.hash;
+      if (!snapshotId && hash.startsWith('#s-')) {
+        snapshotId = hash.substring(3);
+      }
+
       if (snapshotId) {
         const idx = items.findIndex(item => item.id === snapshotId);
         if (idx !== -1) {
@@ -244,8 +251,12 @@ export default function GalleryPage({ onClose }) {
           setLightboxOpen(true);
         }
       }
-    }
-  }, [items, lightboxOpen]);
+    };
+
+    handleDeepLink();
+    window.addEventListener('hashchange', handleDeepLink);
+    return () => window.removeEventListener('hashchange', handleDeepLink);
+  }, [items]);
 
   // Modal and file upload states
   const [uploadModalOpen, setUploadModalOpen] = useState(false);

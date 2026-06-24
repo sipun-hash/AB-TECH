@@ -44,7 +44,8 @@ export default function App() {
     }
 
     const handleHashChange = () => {
-      if (window.location.hash.startsWith('#snapshots')) {
+      const hash = window.location.hash;
+      if (hash.startsWith('#snapshots') || hash.startsWith('#s-')) {
         setGalleryPageOpen(true);
       } else {
         setGalleryPageOpen(false);
@@ -59,7 +60,8 @@ export default function App() {
   }, []);
 
   const handleCloseGallery = () => {
-    if (window.location.hash.startsWith('#snapshots')) {
+    const hash = window.location.hash;
+    if (hash.startsWith('#snapshots') || hash.startsWith('#s-')) {
       window.history.pushState('', document.title, window.location.pathname);
       // Manually trigger hashchange event because pushState doesn't fire it automatically
       window.dispatchEvent(new HashChangeEvent('hashchange'));
