@@ -6,7 +6,10 @@ import {
   getDocs, 
   query, 
   orderBy, 
-  serverTimestamp 
+  serverTimestamp,
+  doc,
+  updateDoc,
+  increment
 } from 'firebase/firestore';
 
 const firebaseConfig = {
@@ -52,4 +55,37 @@ export async function addSnapshot(snapshotData) {
     createdAt: serverTimestamp()
   });
   return docRef.id;
+}
+
+/**
+ * Increment the like count of a snapshot document.
+ * @param {string} snapshotId
+ */
+export async function likeSnapshot(snapshotId) {
+  const docRef = doc(db, 'snapshots', snapshotId);
+  await updateDoc(docRef, {
+    likesCount: increment(1)
+  });
+}
+
+/**
+ * Decrement the like count of a snapshot document.
+ * @param {string} snapshotId
+ */
+export async function unlikeSnapshot(snapshotId) {
+  const docRef = doc(db, 'snapshots', snapshotId);
+  await updateDoc(docRef, {
+    likesCount: increment(-1)
+  });
+}
+
+/**
+ * Increment the share count of a snapshot document.
+ * @param {string} snapshotId
+ */
+export async function shareSnapshot(snapshotId) {
+  const docRef = doc(db, 'snapshots', snapshotId);
+  await updateDoc(docRef, {
+    sharesCount: increment(1)
+  });
 }

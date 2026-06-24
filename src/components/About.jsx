@@ -15,7 +15,7 @@ function TiltCard({ children, className, borderAccent = 'border-t-brandTeal' }) 
   const strokeColor = isAmber ? 'rgba(231,158,60,0.15)' : 'rgba(30,107,123,0.15)';
   const accentClass = isAmber ? 'border-brandAmber/40' : 'border-brandTeal/40';
   const borderHighlight = isAmber ? 'border-brandAmber' : 'border-brandTeal';
-
+ 
   const handleMouseEnter = () => {
     setIsHovered(true);
     const card = cardRef.current;

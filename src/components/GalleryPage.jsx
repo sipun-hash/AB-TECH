@@ -4,13 +4,13 @@ import Lightbox from 'yet-another-react-lightbox';
 import 'yet-another-react-lightbox/styles.css';
 import { 
   ArrowLeft, Maximize2, Users, Award, Coffee, 
-  BookOpen, Presentation, Heart, Upload, X, Film, Image as ImageIcon,
+  BookOpen, Presentation, Heart, Share2, Upload, X, Film, Image as ImageIcon,
   ChevronDown
 } from 'lucide-react';
 import Lenis from 'lenis';
 import ScrollAnimateCard from './ScrollAnimateCard';
 import { uploadToCloudinary } from '../utils/cloudinary';
-import { fetchSnapshots, addSnapshot } from '../utils/firebase';
+import { fetchSnapshots, addSnapshot, likeSnapshot, unlikeSnapshot, shareSnapshot } from '../utils/firebase';
 
 const categoryIcons = {
   Workplace: Users,
@@ -128,6 +128,69 @@ export default function GalleryPage({ onClose }) {
   const [items, setItems] = useState([]);
   const [loadingSnapshots, setLoadingSnapshots] = useState(true);
 
+  // Likes and shares states
+  const [likedIds, setLikedIds] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem('ab_tech_liked_snapshots') || '[]');
+    } catch {
+      return [];
+    }
+  });
+  const [copiedId, setCopiedId] = useState(null);
+
+  useEffect(() => {
+    localStorage.setItem('ab_tech_liked_snapshots', JSON.stringify(likedIds));
+  }, [likedIds]);
+
+  const handleLike = async (itemId, e) => {
+    if (e) e.stopPropagation();
+    const wasLiked = likedIds.includes(itemId);
+    
+    setItems(prevItems => prevItems.map(item => {
+      if (item.id === itemId) {
+        const diff = wasLiked ? -1 : 1;
+        return {
+          ...item,
+          likesCount: Math.max(0, (item.likesCount || 0) + diff)
+        };
+      }
+      return item;
+    }));
+
+    if (wasLiked) {
+      setLikedIds(prev => prev.filter(id => id !== itemId));
+      await unlikeSnapshot(itemId).catch(err => console.error(err));
+    } else {
+      setLikedIds(prev => [...prev, itemId]);
+      await likeSnapshot(itemId).catch(err => console.error(err));
+    }
+  };
+
+  const handleShare = async (item, e) => {
+    if (e) e.stopPropagation();
+    const shareUrl = `${window.location.origin}${window.location.pathname}?snapshot=${item.id}#snapshots`;
+    
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      setCopiedId(item.id);
+      setTimeout(() => setCopiedId(null), 2000);
+    } catch (err) {
+      console.error("Clipboard copy failed", err);
+    }
+
+    setItems(prevItems => prevItems.map(i => {
+      if (i.id === item.id) {
+        return {
+          ...i,
+          sharesCount: (i.sharesCount || 0) + 1
+        };
+      }
+      return i;
+    }));
+
+    await shareSnapshot(item.id).catch(err => console.error(err));
+  };
+
   // Fetch custom snapshots from Firestore on mount
   useEffect(() => {
     let active = true;
@@ -135,7 +198,12 @@ export default function GalleryPage({ onClose }) {
       try {
         const dbSnapshots = await fetchSnapshots();
         if (active) {
-          setItems(dbSnapshots);
+          const formatted = dbSnapshots.map(snap => ({
+            ...snap,
+            likesCount: snap.likesCount || 0,
+            sharesCount: snap.sharesCount || 0,
+          }));
+          setItems(formatted);
         }
       } catch (err) {
         console.error('Failed to fetch snapshots from Firestore:', err);
@@ -150,6 +218,21 @@ export default function GalleryPage({ onClose }) {
       active = false;
     };
   }, []);
+
+  // Auto-open Lightbox from URL parameter
+  useEffect(() => {
+    if (items.length > 0 && !lightboxOpen) {
+      const params = new URLSearchParams(window.location.search);
+      const snapshotId = params.get('snapshot');
+      if (snapshotId) {
+        const idx = items.findIndex(item => item.id === snapshotId);
+        if (idx !== -1) {
+          setLightboxIndex(idx);
+          setLightboxOpen(true);
+        }
+      }
+    }
+  }, [items, lightboxOpen]);
 
   // Modal and file upload states
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
@@ -337,9 +420,15 @@ export default function GalleryPage({ onClose }) {
     const isVideo = !!(item.isVideo || (item.url && (item.url.match(/\.(mp4|webm|ogg|mov|m4v|3gp|quicktime)$/i) || item.url.includes('/video/upload/'))));
     return {
       src: item.url,
-      type: isVideo ? 'video' : 'image'
+      type: isVideo ? 'video' : 'image',
+      id: item.id,
+      title: item.title,
+      likesCount: item.likesCount || 0,
+      sharesCount: item.sharesCount || 0
     };
   });
+
+  const currentLightboxItem = filteredItems[lightboxIndex];
 
   // Animation variants
   const containerVariants = {
@@ -598,7 +687,7 @@ export default function GalleryPage({ onClose }) {
                       </div>
 
                       {/* Details Overlay */}
-                      <div className="relative z-20 bg-white/90 backdrop-blur-sm border-t border-textPrimary/5 p-2.5 pb-2 flex flex-col justify-between min-h-[68px] w-full transition-colors duration-300 group-hover:bg-white shrink-0">
+                      <div className="relative z-20 bg-white/90 backdrop-blur-sm border-t border-textPrimary/5 p-2.5 pb-2 flex flex-col justify-between min-h-[82px] w-full transition-colors duration-300 group-hover:bg-white shrink-0">
                         <div className="flex justify-between items-center mb-1">
                           <div className="flex items-center gap-1.5">
                             <div className="p-1 rounded-none bg-brandTeal/10 border border-brandTeal/10 text-brandTeal">
@@ -612,12 +701,37 @@ export default function GalleryPage({ onClose }) {
                             {String(idx + 1).padStart(2, '0')}
                           </span>
                         </div>
-                        <h3 className="font-display font-bold text-xs text-textPrimary uppercase tracking-wide truncate">
+                        <h3 className="font-display font-bold text-xs text-textPrimary uppercase tracking-wide truncate mt-0.5">
                           {item.title}
                         </h3>
-                        <p className="text-textMuted text-[10px] leading-relaxed font-sans line-clamp-1 mt-1">
+                        <p className="text-textMuted text-[10px] leading-relaxed font-sans line-clamp-1 mt-0.5">
                           {item.desc}
                         </p>
+
+                        {/* Action Row */}
+                        <div className="flex items-center justify-end gap-4 mt-2 pt-1.5 border-t border-textPrimary/5">
+                          <button 
+                            onClick={(e) => handleLike(item.id, e)} 
+                            className="flex items-center gap-1 hover:text-brandTeal transition-colors text-[9px] font-mono font-semibold text-textMuted group/like relative"
+                            aria-label="Like"
+                          >
+                            <Heart size={11} className={likedIds.includes(item.id) ? "fill-brandTeal text-brandTeal" : "text-textMuted group-hover/like:text-brandTeal"} />
+                            <span>{item.likesCount || 0}</span>
+                          </button>
+                          <button 
+                            onClick={(e) => handleShare(item, e)} 
+                            className="flex items-center gap-1 hover:text-brandTeal transition-colors text-[9px] font-mono font-semibold text-textMuted group/share relative"
+                            aria-label="Share"
+                          >
+                            <Share2 size={11} className="text-textMuted group-hover/share:text-brandTeal" />
+                            <span>{item.sharesCount || 0}</span>
+                            {copiedId === item.id && (
+                              <span className="absolute -top-7 left-1/2 -translate-x-1/2 bg-brandTeal text-white text-[8px] px-1.5 py-0.5 rounded shadow z-30 whitespace-nowrap">
+                                Copied!
+                              </span>
+                            )}
+                          </button>
+                        </div>
                       </div>
                     </motion.div>
                   </ScrollAnimateCard>
@@ -641,6 +755,11 @@ export default function GalleryPage({ onClose }) {
         close={() => setLightboxOpen(false)}
         index={lightboxIndex}
         slides={slides}
+        on={{
+          view: ({ index }) => {
+            setLightboxIndex(index);
+          }
+        }}
         render={{
           slide: ({ slide, current }) => {
             if (slide.type === 'video') {
@@ -653,6 +772,45 @@ export default function GalleryPage({ onClose }) {
           container: { backgroundColor: 'rgba(242, 242, 242, 0.98)' }
         }}
       />
+
+      {/* Lightbox Custom Floating HUD Toolbar */}
+      <AnimatePresence>
+        {lightboxOpen && currentLightboxItem && (
+          <motion.div 
+            initial={{ opacity: 0, y: 50, x: "-50%" }}
+            animate={{ opacity: 1, y: 0, x: "-50%" }}
+            exit={{ opacity: 0, y: 50, x: "-50%" }}
+            transition={{ type: 'spring', damping: 25, stiffness: 250 }}
+            className="fixed bottom-6 left-1/2 z-[1000000] bg-white/95 backdrop-blur-md px-6 py-3 border border-textPrimary/10 shadow-2xl flex items-center gap-6 rounded-none select-none"
+          >
+            <span className="font-mono text-[10px] font-bold text-brandTeal uppercase tracking-wider max-w-[120px] sm:max-w-[200px] truncate mr-1">
+              {currentLightboxItem.title}
+            </span>
+            <div className="h-4 w-[1px] bg-textPrimary/10" />
+            <button 
+              onClick={() => handleLike(currentLightboxItem.id)} 
+              className="flex items-center gap-1.5 hover:text-brandTeal transition-colors text-xs font-mono font-bold text-textMuted group/like relative"
+              aria-label="Like"
+            >
+              <Heart size={13} className={likedIds.includes(currentLightboxItem.id) ? "fill-brandTeal text-brandTeal animate-pulse" : "text-textMuted group-hover/like:text-brandTeal"} />
+              <span>{currentLightboxItem.likesCount || 0}</span>
+            </button>
+            <button 
+              onClick={() => handleShare(currentLightboxItem)} 
+              className="flex items-center gap-1.5 hover:text-brandTeal transition-colors text-xs font-mono font-bold text-textMuted group/share relative"
+              aria-label="Share"
+            >
+              <Share2 size={13} className="text-textMuted group-hover/share:text-brandTeal" />
+              <span>{currentLightboxItem.sharesCount || 0}</span>
+              {copiedId === currentLightboxItem.id && (
+                <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-brandTeal text-white text-[8px] px-1.5 py-0.5 rounded shadow z-30 whitespace-nowrap">
+                  Copied!
+                </span>
+              )}
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Upload Modal Overlay */}
       <AnimatePresence>

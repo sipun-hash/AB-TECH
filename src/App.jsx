@@ -38,8 +38,13 @@ export default function App() {
 
   // Sync galleryPageOpen state with URL hash navigation
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.has('snapshot') && !window.location.hash.startsWith('#snapshots')) {
+      window.location.hash = 'snapshots';
+    }
+
     const handleHashChange = () => {
-      if (window.location.hash === '#snapshots') {
+      if (window.location.hash.startsWith('#snapshots')) {
         setGalleryPageOpen(true);
       } else {
         setGalleryPageOpen(false);
@@ -54,8 +59,8 @@ export default function App() {
   }, []);
 
   const handleCloseGallery = () => {
-    if (window.location.hash === '#snapshots') {
-      window.history.pushState('', document.title, window.location.pathname + window.location.search);
+    if (window.location.hash.startsWith('#snapshots')) {
+      window.history.pushState('', document.title, window.location.pathname);
       // Manually trigger hashchange event because pushState doesn't fire it automatically
       window.dispatchEvent(new HashChangeEvent('hashchange'));
     } else {
