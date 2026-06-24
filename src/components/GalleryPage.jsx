@@ -169,14 +169,11 @@ export default function GalleryPage({ onClose }) {
   const handleShare = async (item, e) => {
     if (e) e.stopPropagation();
     const shareUrl = `${window.location.origin}${window.location.pathname}?snapshot=${item.id}#snapshots`;
-    
-    try {
-      await navigator.clipboard.writeText(shareUrl);
-      setCopiedId(item.id);
-      setTimeout(() => setCopiedId(null), 2000);
-    } catch (err) {
-      console.error("Clipboard copy failed", err);
-    }
+    const shareData = {
+      title: item.title,
+      text: item.desc || `Check out this snapshot: ${item.title}`,
+      url: shareUrl
+    };
 
     setItems(prevItems => prevItems.map(i => {
       if (i.id === item.id) {
@@ -187,6 +184,22 @@ export default function GalleryPage({ onClose }) {
       }
       return i;
     }));
+
+    if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
+      try {
+        await navigator.share(shareData);
+      } catch (err) {
+        console.log("Native share cancelled or failed:", err);
+      }
+    } else {
+      try {
+        await navigator.clipboard.writeText(shareUrl);
+        setCopiedId(item.id);
+        setTimeout(() => setCopiedId(null), 2000);
+      } catch (err) {
+        console.error("Clipboard copy failed:", err);
+      }
+    }
 
     await shareSnapshot(item.id).catch(err => console.error(err));
   };
