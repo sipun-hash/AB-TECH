@@ -33,10 +33,10 @@ function TiltCard({ children, className, borderAccent = 'border-t-brandTeal' }) 
     const yc = rect.height / 2;
     const angleX = -(y - yc) / 12; // tilt angle X
     const angleY = (x - xc) / 12; // tilt angle Y
-    
+
     setTiltStyle({
       transform: `perspective(1000px) rotateX(${angleX}deg) rotateY(${angleY}deg) scale3d(1.02, 1.02, 1.02)`,
-      boxShadow: isAmber 
+      boxShadow: isAmber
         ? '0 12px 28px rgba(231, 158, 60, 0.08), 0 0 20px rgba(231, 158, 60, 0.06)'
         : '0 12px 28px rgba(30, 107, 123, 0.08), 0 0 20px rgba(30, 107, 123, 0.06)',
       transition: 'transform 0.05s ease, box-shadow 0.2s ease',
@@ -207,7 +207,7 @@ export default function About() {
             <div className="absolute top-0 left-0 w-3.5 h-3.5 border-t-2 border-l-2 border-white/10" />
             <div className="absolute top-0 right-0 w-3.5 h-3.5 border-t-2 border-r-2 border-white/10" />
             <div className="absolute bottom-0 left-0 w-3.5 h-3.5 border-b-2 border-l-2 border-white/10" />
-            <div className="absolute bottom-0 right-0 w-3.5 h-3.5 border-b-2 border-r-2 border-white/10" />            <motion.h3 
+            <div className="absolute bottom-0 right-0 w-3.5 h-3.5 border-b-2 border-r-2 border-white/10" />            <motion.h3
               initial={{ filter: 'blur(8px)', opacity: 0, y: 15 }}
               whileInView={{ filter: 'blur(0px)', opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -222,7 +222,7 @@ export default function About() {
                 <div key={idx} className="flex gap-6 items-start group relative">
                   {/* Timeline track segment (drawn downwards from current dot to next dot) */}
                   {idx < milestones.length - 1 && (
-                    <motion.div 
+                    <motion.div
                       className="absolute left-3 -translate-x-[1px] top-3 w-[2px] pointer-events-none overflow-hidden"
                       style={{ bottom: '-44px', originY: 0 }}
                       initial={{ scaleY: 0 }}
@@ -231,13 +231,13 @@ export default function About() {
                       transition={{ duration: 0.8, ease: "easeOut", delay: idx * 0.15 }}
                     >
                       <svg className="w-full h-full overflow-visible">
-                        <line 
-                          x1="1" 
-                          y1="0" 
-                          x2="1" 
-                          y2="100%" 
-                          stroke="#1E6B7B" 
-                          strokeWidth="2" 
+                        <line
+                          x1="1"
+                          y1="0"
+                          x2="1"
+                          y2="100%"
+                          stroke="#1E6B7B"
+                          strokeWidth="2"
                           strokeDasharray="4 5"
                           strokeLinecap="round"
                           className="animate-line-dash"
@@ -248,7 +248,7 @@ export default function About() {
                   )}
 
                   {/* Pulse Dot */}
-                  <motion.div 
+                  <motion.div
                     className="relative z-10 flex items-center justify-center w-6 h-6 rounded-full bg-bgDark border border-brandTeal/20"
                     initial={{ scale: 0, opacity: 0 }}
                     whileInView={{ scale: 1, opacity: 1 }}
@@ -256,9 +256,8 @@ export default function About() {
                     transition={{ duration: 0.5, delay: idx * 0.15, ease: [0.16, 1, 0.3, 1] }}
                   >
                     <motion.div
-                      className={`w-2.5 h-2.5 rounded-full ${
-                        idx === milestones.length - 1 ? 'bg-brandAmber shadow-neon-amber' : 'bg-brandTeal shadow-neon-teal'
-                      }`}
+                      className={`w-2.5 h-2.5 rounded-full ${idx === milestones.length - 1 ? 'bg-brandAmber shadow-neon-amber' : 'bg-brandTeal shadow-neon-teal'
+                        }`}
                       initial={{ scale: 0.8 }}
                       animate={{
                         scale: [0.8, 1.2, 0.8],
@@ -272,7 +271,7 @@ export default function About() {
                   </motion.div>
 
                   {/* Text Details */}
-                  <motion.div 
+                  <motion.div
                     className="flex-1"
                     initial={{ filter: 'blur(6px)', opacity: 0, y: 15 }}
                     whileInView={{ filter: 'blur(0px)', opacity: 1, y: 0 }}

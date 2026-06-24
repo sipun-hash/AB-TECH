@@ -52,6 +52,34 @@ const animationPatterns = [
   }
 ];
 
+const VideoSlide = ({ src, isCurrent }) => {
+  const videoRef = useRef(null);
+
+  useEffect(() => {
+    if (videoRef.current) {
+      if (isCurrent) {
+        videoRef.current.play().catch(err => {
+          console.warn("Autoplay blocked:", err);
+        });
+      } else {
+        videoRef.current.pause();
+      }
+    }
+  }, [isCurrent]);
+
+  return (
+    <div className="w-full h-full flex items-center justify-center p-4">
+      <video
+        ref={videoRef}
+        src={src}
+        className="max-w-full max-h-full object-contain"
+        controls
+        playsInline
+      />
+    </div>
+  );
+};
+
 export default function GalleryPage({ onClose }) {
   const [activeCategory, setActiveCategory] = useState('All');
   const [lightboxOpen, setLightboxOpen] = useState(false);
@@ -268,7 +296,13 @@ export default function GalleryPage({ onClose }) {
     ? items
     : items.filter(item => item.category === activeCategory);
 
-  const slides = filteredItems.map(item => ({ src: item.url }));
+  const slides = filteredItems.map(item => {
+    const isVideo = !!(item.isVideo || (item.url && (item.url.match(/\.(mp4|webm|ogg|mov|m4v|3gp|quicktime)$/i) || item.url.includes('/video/upload/'))));
+    return {
+      src: item.url,
+      type: isVideo ? 'video' : 'image'
+    };
+  });
 
   // Animation variants
   const containerVariants = {
@@ -548,21 +582,11 @@ export default function GalleryPage({ onClose }) {
         index={lightboxIndex}
         slides={slides}
         render={{
-          slide: ({ slide }) => {
+          slide: ({ slide, current }) => {
             if (slide.type === 'video') {
-              return (
-                <div className="w-full h-full flex items-center justify-center p-4">
-                  <video
-                    src={slide.src}
-                    className="max-w-full max-h-full object-contain"
-                    controls
-                    autoPlay
-                    playsInline
-                  />
-                </div>
-              );
+              return <VideoSlide src={slide.src} isCurrent={current} />;
             }
-            return null;
+            return undefined; // Let the default renderer handle images
           }
         }}
         styles={{
