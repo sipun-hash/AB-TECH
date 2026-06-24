@@ -711,7 +711,7 @@ export default function GalleryPage({ onClose }) {
                       </div>
 
                       {/* Details Overlay */}
-                      <div className="relative z-20 bg-white/90 backdrop-blur-sm border-t border-textPrimary/5 p-2.5 pb-2 flex flex-col justify-between min-h-[82px] w-full transition-colors duration-300 group-hover:bg-white shrink-0">
+                      <div className="relative z-20 bg-white/90 backdrop-blur-sm border-t border-textPrimary/5 p-2.5 pb-2 flex flex-col justify-between min-h-[64px] w-full transition-colors duration-300 group-hover:bg-white shrink-0">
                         <div className="flex justify-between items-center mb-1">
                           <div className="flex items-center gap-1.5">
                             <div className="p-1 rounded-none bg-brandTeal/10 border border-brandTeal/10 text-brandTeal">
@@ -721,9 +721,31 @@ export default function GalleryPage({ onClose }) {
                               {item.category}
                             </span>
                           </div>
-                          <span className="font-mono text-[10px] text-textMuted">
-                            {String(idx + 1).padStart(2, '0')}
-                          </span>
+
+                          {/* Actions replacing the asset count */}
+                          <div className="flex items-center gap-3">
+                            <button 
+                              onClick={(e) => handleLike(item.id, e)} 
+                              className="flex items-center gap-1 hover:text-brandTeal transition-colors text-[9px] font-mono font-semibold text-textMuted group/like relative"
+                              aria-label="Like"
+                            >
+                              <Heart size={11} className={likedIds.includes(item.id) ? "fill-brandTeal text-brandTeal" : "text-textMuted group-hover/like:text-brandTeal"} />
+                              <span>{item.likesCount || 0}</span>
+                            </button>
+                            <button 
+                              onClick={(e) => handleShare(item, e)} 
+                              className="flex items-center gap-1 hover:text-brandTeal transition-colors text-[9px] font-mono font-semibold text-textMuted group/share relative"
+                              aria-label="Share"
+                            >
+                              <Share2 size={11} className="text-textMuted group-hover/share:text-brandTeal" />
+                              <span>{item.sharesCount || 0}</span>
+                              {copiedId === item.id && (
+                                <span className="absolute -top-7 left-1/2 -translate-x-1/2 bg-brandTeal text-white text-[8px] px-1.5 py-0.5 rounded shadow z-30 whitespace-nowrap">
+                                  Copied!
+                                </span>
+                              )}
+                            </button>
+                          </div>
                         </div>
                         <h3 className="font-display font-bold text-xs text-textPrimary uppercase tracking-wide truncate mt-0.5">
                           {item.title}
@@ -731,31 +753,6 @@ export default function GalleryPage({ onClose }) {
                         <p className="text-textMuted text-[10px] leading-relaxed font-sans line-clamp-1 mt-0.5">
                           {item.desc}
                         </p>
-
-                        {/* Action Row */}
-                        <div className="flex items-center justify-end gap-4 mt-2 pt-1.5 border-t border-textPrimary/5">
-                          <button 
-                            onClick={(e) => handleLike(item.id, e)} 
-                            className="flex items-center gap-1 hover:text-brandTeal transition-colors text-[9px] font-mono font-semibold text-textMuted group/like relative"
-                            aria-label="Like"
-                          >
-                            <Heart size={11} className={likedIds.includes(item.id) ? "fill-brandTeal text-brandTeal" : "text-textMuted group-hover/like:text-brandTeal"} />
-                            <span>{item.likesCount || 0}</span>
-                          </button>
-                          <button 
-                            onClick={(e) => handleShare(item, e)} 
-                            className="flex items-center gap-1 hover:text-brandTeal transition-colors text-[9px] font-mono font-semibold text-textMuted group/share relative"
-                            aria-label="Share"
-                          >
-                            <Share2 size={11} className="text-textMuted group-hover/share:text-brandTeal" />
-                            <span>{item.sharesCount || 0}</span>
-                            {copiedId === item.id && (
-                              <span className="absolute -top-7 left-1/2 -translate-x-1/2 bg-brandTeal text-white text-[8px] px-1.5 py-0.5 rounded shadow z-30 whitespace-nowrap">
-                                Copied!
-                              </span>
-                            )}
-                          </button>
-                        </div>
                       </div>
                     </motion.div>
                   </ScrollAnimateCard>
