@@ -2,7 +2,6 @@ import React from 'react';
 
 const items = [
   "DATA OPERATOR",
-  "DATA MINER",
   "PROJECT COORDINATOR",
   "FRESHERS WELCOME",
   "ODISHA HIRING",

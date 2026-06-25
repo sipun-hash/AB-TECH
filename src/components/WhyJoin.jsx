@@ -106,6 +106,47 @@ export default function WhyJoin() {
   );
 }
 
+function WhyJoinCutoutNumber({ num, themeColor }) {
+  const label = String(num + 1).padStart(2, '0');
+  const gradId = `wj-grad-${label}`;
+  const filterId = `wj-filter-${label}`;
+  return (
+    <svg viewBox="0 0 80 60" width="64" height="48" aria-hidden="true" style={{ display: 'block', flexShrink: 0 }}>
+      <defs>
+        <linearGradient id={gradId} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#ffffff" />
+          <stop offset="42%" stopColor="#ffffff" />
+          <stop offset="42%" stopColor={themeColor} />
+          <stop offset="100%" stopColor={themeColor} />
+        </linearGradient>
+        <filter id={filterId} x="-8%" y="-8%" width="120%" height="130%">
+          <feGaussianBlur stdDeviation="0.8" in="SourceGraphic" result="blur" />
+          <feOffset dx="0" dy="2" in="blur" result="offset" />
+          <feComposite operator="out" in="SourceGraphic" in2="offset" result="inverse" />
+          <feFlood floodColor="#000000" floodOpacity="0.38" result="color" />
+          <feComposite operator="in" in="color" in2="inverse" result="shadow" />
+          <feComposite operator="over" in="shadow" in2="SourceGraphic" />
+        </filter>
+      </defs>
+      <text
+        x="50%"
+        y="88%"
+        textAnchor="middle"
+        fill={`url(#${gradId})`}
+        filter={`url(#${filterId})`}
+        style={{
+          fontFamily: 'Outfit, system-ui, sans-serif',
+          fontWeight: 900,
+          fontSize: '54px',
+          letterSpacing: '-1.5px'
+        }}
+      >
+        {label}
+      </text>
+    </svg>
+  );
+}
+
 function WhyJoinCard({ benefit, idx, themeColor, themeBgClass, themeTextClass, isTeal }) {
   const canvasRef = React.useRef(null);
   const [isHovered, setIsHovered] = React.useState(false);
@@ -371,6 +412,11 @@ function WhyJoinCard({ benefit, idx, themeColor, themeBgClass, themeTextClass, i
 
         {/* Radar scanline sweep */}
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-brandTeal/[0.02] to-transparent h-[150%] w-full -translate-y-full group-hover:animate-[scanline_3s_linear_infinite]" />
+      </div>
+
+      {/* Paper-Cutout Number at top-right */}
+      <div className="absolute top-2 right-2 pointer-events-none select-none z-20 opacity-80">
+        <WhyJoinCutoutNumber num={idx} themeColor={themeColor} />
       </div>
 
       {/* Corner '+' markers positioned exactly on intersections, outside the box boundaries without clipping */}

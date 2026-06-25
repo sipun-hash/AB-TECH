@@ -68,6 +68,19 @@ const getVideoPosterUrl = (url, isThumbnail = true) => {
   return url.replace('/video/upload/', `/video/upload/${transformation}/`).replace(/\.[^/.]+$/, '.jpg');
 };
 
+const slugify = (text) => {
+  if (!text) return '';
+  return text
+    .toString()
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, '-')           // Replace spaces with -
+    .replace(/[^\w\-]+/g, '')       // Remove all non-word chars
+    .replace(/\-\-+/g, '-')         // Replace multiple - with single -
+    .replace(/^-+/, '')             // Trim - from start of text
+    .replace(/-+$/, '');            // Trim - from end of text
+};
+
 const SkeletonCard = ({ gridClass }) => {
   return (
     <div className={`${gridClass} relative overflow-hidden border border-textPrimary/5 bg-white/40 flex flex-col justify-end w-full h-full rounded-none`}>
@@ -185,9 +198,10 @@ export default function GalleryPage({ onClose }) {
 
   const handleShare = async (item, e) => {
     if (e) e.stopPropagation();
-    const shareUrl = `${window.location.origin}${window.location.pathname}#s-${item.id}`;
+    const slug = slugify(item.title);
+    const shareUrl = `${window.location.origin}${window.location.pathname}#s-${item.id}${slug ? '-' + slug : ''}`;
     const shareData = {
-      title: item.title,
+      title: `${item.title} | AB IT Solutions`,
       text: item.desc || `Check out this snapshot: ${item.title}`,
       url: shareUrl
     };
@@ -258,14 +272,19 @@ export default function GalleryPage({ onClose }) {
       
       const hash = window.location.hash;
       if (!snapshotId && hash.startsWith('#s-')) {
-        snapshotId = hash.substring(3);
+        const routeData = hash.substring(3);
+        snapshotId = routeData.split('-')[0];
       }
 
       if (snapshotId) {
-        const idx = items.findIndex(item => item.id === snapshotId);
-        if (idx !== -1) {
-          setLightboxIndex(idx);
-          setLightboxOpen(true);
+        const foundItem = items.find(item => item.id === snapshotId);
+        if (foundItem) {
+          setActiveCategory('All');
+          const idx = items.findIndex(item => item.id === snapshotId);
+          if (idx !== -1) {
+            setLightboxIndex(idx);
+            setLightboxOpen(true);
+          }
         }
       }
     };
@@ -832,33 +851,50 @@ export default function GalleryPage({ onClose }) {
             animate={{ opacity: 1, y: 0, x: "-50%" }}
             exit={{ opacity: 0, y: 50, x: "-50%" }}
             transition={{ type: 'spring', damping: 25, stiffness: 250 }}
-            className="fixed bottom-6 left-1/2 z-[1000000] bg-white/95 backdrop-blur-md px-6 py-3 border border-textPrimary/10 shadow-2xl flex items-center gap-6 rounded-none select-none"
+            className="fixed bottom-6 left-1/2 z-[1000000] bg-white/95 backdrop-blur-md px-6 py-4 border border-textPrimary/10 shadow-2xl flex flex-col gap-3 rounded-none select-none w-[90%] max-w-lg"
           >
-            <span className="font-mono text-[10px] font-bold text-brandTeal uppercase tracking-wider max-w-[120px] sm:max-w-[200px] truncate mr-1">
-              {currentLightboxItem.title}
-            </span>
-            <div className="h-4 w-[1px] bg-textPrimary/10" />
-            <button 
-              onClick={() => handleLike(currentLightboxItem.id)} 
-              className="flex items-center gap-1.5 hover:text-brandTeal transition-colors text-xs font-mono font-bold text-textMuted group/like relative"
-              aria-label="Like"
-            >
-              <Heart size={13} className={likedIds.includes(currentLightboxItem.id) ? "fill-brandTeal text-brandTeal animate-pulse" : "text-textMuted group-hover/like:text-brandTeal"} />
-              <span>{currentLightboxItem.likesCount || 0}</span>
-            </button>
-            <button 
-              onClick={() => handleShare(currentLightboxItem)} 
-              className="flex items-center gap-1.5 hover:text-brandTeal transition-colors text-xs font-mono font-bold text-textMuted group/share relative"
-              aria-label="Share"
-            >
-              <Share2 size={13} className="text-textMuted group-hover/share:text-brandTeal" />
-              <span>{currentLightboxItem.sharesCount || 0}</span>
-              {copiedId === currentLightboxItem.id && (
-                <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-brandTeal text-white text-[8px] px-1.5 py-0.5 rounded shadow z-30 whitespace-nowrap">
-                  Copied!
-                </span>
+            {/* Header row: Category & Actions */}
+            <div className="flex justify-between items-center w-full">
+              <span className="font-mono text-[9px] font-bold text-brandTeal uppercase tracking-wider bg-brandTeal/10 px-2 py-0.5 border border-brandTeal/10">
+                {currentLightboxItem.category}
+              </span>
+              
+              <div className="flex items-center gap-4">
+                <button 
+                  onClick={() => handleLike(currentLightboxItem.id)} 
+                  className="flex items-center gap-1.5 hover:text-brandTeal transition-colors text-xs font-mono font-bold text-textMuted group/like relative"
+                  aria-label="Like"
+                >
+                  <Heart size={13} className={likedIds.includes(currentLightboxItem.id) ? "fill-brandTeal text-brandTeal animate-pulse" : "text-textMuted group-hover/like:text-brandTeal"} />
+                  <span>{currentLightboxItem.likesCount || 0}</span>
+                </button>
+                <button 
+                  onClick={() => handleShare(currentLightboxItem)} 
+                  className="flex items-center gap-1.5 hover:text-brandTeal transition-colors text-xs font-mono font-bold text-textMuted group/share relative"
+                  aria-label="Share"
+                >
+                  <Share2 size={13} className="text-textMuted group-hover/share:text-brandTeal" />
+                  <span>{currentLightboxItem.sharesCount || 0}</span>
+                  {copiedId === currentLightboxItem.id && (
+                    <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-brandTeal text-white text-[8px] px-1.5 py-0.5 rounded shadow z-30 whitespace-nowrap">
+                      Copied!
+                    </span>
+                  )}
+                </button>
+              </div>
+            </div>
+
+            {/* Title and Description */}
+            <div className="flex flex-col gap-1">
+              <h4 className="font-display font-bold text-sm text-textPrimary uppercase tracking-wide">
+                {currentLightboxItem.title}
+              </h4>
+              {currentLightboxItem.desc && (
+                <p className="text-textMuted text-[11px] leading-relaxed font-sans line-clamp-2">
+                  {currentLightboxItem.desc}
+                </p>
               )}
-            </button>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>

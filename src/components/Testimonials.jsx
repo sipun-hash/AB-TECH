@@ -17,7 +17,7 @@ const testimonials = [
     initials: 'RK',
     avatarBg: 'border-brandAmber/30 text-brandAmber bg-brandAmber/5',
     name: 'Rohit K.',
-    role: 'Data Miner',
+    role: 'Data Operator',
     college: 'Sophitorium Group of Institutions',
     quote: 'I joined as a fresher with zero industry experience. AB IT Solutions gave me real project work from week one, helping me build skills rapidly.'
   },

@@ -175,7 +175,7 @@ export default function About() {
                     <Briefcase className="text-brandAmber" size={20} />
                   </div>
                   <div>
-                    <h3 className="font-display font-extrabold text-3xl text-brandAmber drop-shadow-[0_0_10px_rgba(26,61,99,0.15)] tracking-tight">3 Roles</h3>
+                    <h3 className="font-display font-extrabold text-3xl text-brandAmber drop-shadow-[0_0_10px_rgba(26,61,99,0.15)] tracking-tight">2 Roles</h3>
                     <p className="text-[10px] text-textMuted font-mono mt-1.5 uppercase tracking-widest">Open Positions</p>
                   </div>
                 </TiltCard>
